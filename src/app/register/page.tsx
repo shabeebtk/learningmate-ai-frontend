@@ -1,4 +1,4 @@
-import UserRegisterLogin from "@/components/UserRegisterLogin"
+import UserRegisterLogin from "@/components/AuthModal"
 
 export default function RegisterOrLoginPage() {
     return (

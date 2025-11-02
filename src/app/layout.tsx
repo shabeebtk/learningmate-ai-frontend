@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProviderWrapper } from "@/providers/AuthProviderWrapper";
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 
 const geistSans = Geist({
@@ -22,8 +23,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Prevent iOS zoom on input */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AuthProviderWrapper>{children}</AuthProviderWrapper>
+        <AppRouterCacheProvider>
+          <AuthProviderWrapper>{children}</AuthProviderWrapper>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

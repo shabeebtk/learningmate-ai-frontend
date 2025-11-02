@@ -24,3 +24,30 @@ export async function verifyOtp(payload: { email: string; otp: string }) {
   });
   return res.json();
 }
+
+export async function getGoogleLoginUrl() {
+  const res = await fetch("/api/authentication/user/auth/google/login/url", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch Google login URL");
+  }
+
+  return res.json();
+}
+
+
+export async function handleGoogleCallback(code: string) {
+  const res = await fetch(`/api/authentication/user/auth/google/callback?code=${code}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Callback request failed: ${res.status}`);
+  }
+
+  return res.json();
+}

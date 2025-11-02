@@ -1,26 +1,105 @@
-@import "tailwindcss";
+/** @import must precede all other statements */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ==== Light Theme (Warm & Comfortable) ==== */
+  
+  /* Primary: Deep, trustworthy blue */
+  --color-primary: #1d4ed8; /* Deeper blue for authority */
+  --color-primary-hover: #1e40af;
+  --color-primary-light: #dbeafe;
+  
+  /* Accent: Warm, engaging coral/orange */
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-accent-light: #ffedd5;
+
+  /* Backgrounds: Warm, paper-like tones */
+  --color-background: #f5f3f0; /* Warm beige - less harsh than white */
+  --color-surface: #fdfcfb; /* Subtle cream for cards */
+  --color-surface-hover: #f8f6f3;
+
+  /* Text: Rich, readable contrast */
+  --color-text-primary: #1a1614; /* Warm black */
+  --color-text-secondary: #57534e; /* Warm gray */
+  --color-text-tertiary: #a8a29e;
+
+  /* Borders & Dividers: Warm neutrals */
+  --color-border: #e7e5e4; /* Soft stone */
+  --color-border-strong: #d6d3d1;
+
+  /* Feedback: Clear status indicators */
+  --color-success: #059669;
+  --color-success-light: #d1fae5;
+  --color-error: #dc2626;
+  --color-error-light: #fee2e2;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-info: #0284c7;
+  --color-info-light: #e0f2fe;
+
+  /* Shadows: Warm, natural depth */
+  --shadow-xs: 0 1px 2px rgba(120, 53, 15, 0.08);
+  --shadow-sm: 0 2px 4px rgba(120, 53, 15, 0.1);
+  --shadow-md: 0 4px 6px rgba(120, 53, 15, 0.12);
+  --shadow-lg: 0 10px 15px rgba(120, 53, 15, 0.15);
+}
+/* ==== Dark Theme (Reduced Eye Strain) ==== */
+[data-theme="dark"] {
+  /* Primary: Softer blue for dark mode */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93c5fd;
+  --color-primary-light: #1e3a8a;
+  
+  /* Accent: Warmer for visibility */
+  --color-accent: #fb923c;
+  --color-accent-hover: #fdba74;
+  --color-accent-light: #7c2d12;
+
+  /* Backgrounds: True dark with contrast */
+  --color-background: #0a0a0a; /* Deep black */
+  --color-surface: #171717; /* Cards slightly lighter */
+  --color-surface-hover: #262626;
+
+  /* Text: Optimized for OLED */
+  --color-text-primary: #fafafa; /* Soft white */
+  --color-text-secondary: #a3a3a3; /* Medium gray */
+  --color-text-tertiary: #737373;
+
+  /* Borders */
+  --color-border: #262626;
+  --color-border-strong: #404040;
+
+  /* Feedback */
+  --color-success: #10b981;
+  --color-success-light: #064e3b;
+  --color-error: #f87171;
+  --color-error-light: #7f1d1d;
+  --color-warning: #fbbf24;
+  --color-warning-light: #78350f;
+  --color-info: #38bdf8;
+  --color-info-light: #0c4a6e;
+
+  /* Shadows: More pronounced in dark */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+/* ==== Reset & Base ==== */
+* {
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
 }
