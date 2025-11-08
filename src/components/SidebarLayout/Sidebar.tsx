@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, X, Compass, Layers, BookOpen, CreditCard  } from "lucide-react";
+import { Settings, X, Compass, Layers, BookOpen, CreditCard, Users  } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./SidebarLayout.module.css";
@@ -20,6 +20,7 @@ export default function Sidebar({ isOpen: externalIsOpen, onToggle }: SidebarPro
         { path: "/learn", icon: Compass, label: "Discover" },
         { path: "/learn/categories", icon: Layers, label: "Categories" },
         { path: "/learn/topics", icon: BookOpen, label: "Topics" },
+        { path: "/characters", icon: Users, label: "Characters" },
         { path: "/learn/settings", icon: Settings, label: "Settings" },
 
         { path: "#", icon: CreditCard, label: "Subscription", disabled: true },
