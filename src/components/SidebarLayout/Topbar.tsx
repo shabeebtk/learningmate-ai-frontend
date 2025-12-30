@@ -1,11 +1,12 @@
 "use client";
 
-import { Menu, Moon, Sun, User } from "lucide-react";
+import { Menu, Moon, NotebookPen, Pointer, Sun, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import AuthModal from "../AuthModal";
 import styles from "./SidebarLayout.module.css";
+import AddNoteModal from '../LearningNotes/AddNoteModal'
 
 interface TopbarProps {
   onHamburgerClick?: () => void;
@@ -16,6 +17,7 @@ export default function Topbar({ onHamburgerClick }: TopbarProps) {
   const { user, authenticating } = useAuth();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
 
   // Load saved theme from localStorage on mount
   useEffect(() => {
@@ -30,6 +32,10 @@ export default function Topbar({ onHamburgerClick }: TopbarProps) {
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("theme", newTheme);
+  };
+
+  const closeAddModal = () => {
+    setIsAddNoteModalOpen(false);
   };
 
   return (
@@ -47,10 +53,19 @@ export default function Topbar({ onHamburgerClick }: TopbarProps) {
         </div>
 
         <div className={styles.topbarRight}>
+            {user && (
+              <NotebookPen
+              size={20}
+              style={{ cursor: "pointer" }}
+              onClick={()=> setIsAddNoteModalOpen(true)}
+              />
+            )}
+
           {/* Theme toggle button */}
           <span
             onClick={toggleTheme}
             aria-label="Toggle theme"
+            style={{ cursor: "pointer" }}
           >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </span>
@@ -99,6 +114,14 @@ export default function Topbar({ onHamburgerClick }: TopbarProps) {
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* add note modal  */}
+      <AddNoteModal
+        isOpen={isAddNoteModalOpen}
+        onClose={closeAddModal}
+        editingNote={null}
+      />
+
     </>
   );
 }

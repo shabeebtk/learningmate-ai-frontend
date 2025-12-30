@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProviderWrapper } from "@/providers/AuthProviderWrapper";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper/ClientLayoutWrapper";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +32,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AppRouterCacheProvider>
-          <AuthProviderWrapper>
-            <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-          </AuthProviderWrapper>
+          <Providers>
+            <AuthProviderWrapper>
+              <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+            </AuthProviderWrapper>
+          </Providers>
         </AppRouterCacheProvider>
       </body>
     </html>

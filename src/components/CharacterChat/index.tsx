@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  ArrowLeft, 
-  Send, 
-  Loader2, 
+import { useAuth } from "@/app/hooks/useAuth";
+import {
+  ArrowLeft,
+  Send,
+  Loader2,
   User,
   Bot,
   Info
@@ -43,6 +44,7 @@ type CharacterChatProps = {
 
 export default function CharacterChat({ characterId }: CharacterChatProps) {
   const router = useRouter();
+  const { user, authenticating } = useAuth();
   const [character, setCharacter] = useState<Character | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -52,6 +54,7 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
 
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const initialScrollDone = useRef(false);
@@ -73,7 +76,7 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
   // Fetch messages
   const fetchMessages = async (reset = false) => {
     if (!reset && (!hasMore || loadingMore)) return;
-    
+
     const currentOffset = reset ? 0 : offset;
     setLoadingMore(true);
 
@@ -82,10 +85,10 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
         `/api/ai-characters/${characterId}/chat/messages?limit=20&offset=${currentOffset}`
       );
       const data = await res.json();
-      
+
       if (data.success) {
         const newMessages = data.data.data;
-        
+
         if (reset) {
           setMessages(newMessages);
           setOffset(20);
@@ -94,7 +97,7 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
           setMessages(prev => [...newMessages, ...prev]);
           setOffset(prev => prev + 20);
         }
-        
+
         setHasMore(data.data.next_offset !== null);
       }
     } catch (error) {
@@ -105,12 +108,24 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
     }
   };
 
+  function normalizeNewlines(text: string): string {
+    // Replace 3 or more consecutive newlines (with spaces) with just 2
+    return text.replace(/(\n\s*){3,}/g, "\n\n").trim();
+  }
+
   // Send message
   const sendMessage = async () => {
     if (!newMessage.trim() || sending) return;
 
-    const messageText = newMessage.trim();
+    // Clean up message before sending
+    const messageText = normalizeNewlines(newMessage);
+
+    if (!messageText) return; // ignore if becomes empty
+
     setNewMessage("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
     setSending(true);
 
     try {
@@ -124,7 +139,7 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
       });
 
       const data = await res.json();
-      
+
       if (data.success) {
         // Add user message and AI response
         const userMsg: Message = {
@@ -146,7 +161,7 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
         };
 
         setMessages(prev => [...prev, userMsg, aiMsg]);
-        
+
         // Scroll to bottom after new message
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -203,6 +218,14 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMessage(e.target.value);
+
+    const textarea = e.target;
+    textarea.style.height = "auto"; // reset height
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`; // grow up to max height
+  };
+
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -243,8 +266,8 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
       </div>
 
       {/* Messages Container */}
-      <div 
-        className={styles.messagesContainer} 
+      <div
+        className={styles.messagesContainer}
         ref={messagesContainerRef}
         onScroll={handleScroll}
       >
@@ -258,14 +281,17 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`${styles.messageWrapper} ${
-              msg.sender === "user" ? styles.userMessage : styles.aiMessage
-            }`}
+            className={`${styles.messageWrapper} ${msg.sender === "user" ? styles.userMessage : styles.aiMessage
+              }`}
           >
             <div className={styles.messageAvatar}>
               {msg.sender === "user" ? (
                 <div className={styles.userAvatar}>
-                  <User size={18} />
+                  {user && user.profile_img ?
+                    <img src={user?.profile_img || ""} alt={user?.name || "User avatar"} className={styles.userAvatar} />
+                    :
+                    <User size={18} />
+                  }
                 </div>
               ) : (
                 <img src={character.avatar} alt={character.name} className={styles.aiAvatar} />
@@ -276,15 +302,15 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
                 <p className={styles.messageText}>{msg.message}</p>
               </div>
               <span className={styles.messageTime}>
-                {new Date(msg.created_at).toLocaleTimeString([], { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
+                {new Date(msg.created_at).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
                 })}
               </span>
             </div>
           </div>
         ))}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -292,14 +318,16 @@ export default function CharacterChat({ characterId }: CharacterChatProps) {
       <div className={styles.inputArea}>
         <div className={styles.inputWrapper}>
           <textarea
+            ref={textareaRef}
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyPress}
             placeholder={`Message ${character.name}...`}
             className={styles.input}
             rows={1}
             disabled={sending}
           />
+
           <button
             onClick={sendMessage}
             disabled={!newMessage.trim() || sending}

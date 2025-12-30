@@ -36,7 +36,7 @@ export async function POST() {
         name: ACCESS_TOKEN_KEY,
         value: newAccessToken,
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
         expires: new Date(decoded.exp * 1000),
